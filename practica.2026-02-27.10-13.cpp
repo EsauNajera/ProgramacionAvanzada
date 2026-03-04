@@ -1,38 +1,11 @@
 #include <iostream>
-#include <string>
+#include <cstring>
 #include <math.h>
 
 using namespace std;
 
 #define PROPORTION_16_9 16.0f/9.0f
 #define PROPORTION_4_3   4.0f/3.0f
-
-class Computer{
-  public:
-    Computer(const char* name){
-	m_name = new char[strlen(name)+1];
-	strcpy(m_name, name);
-	for(int i = 0;i<sizeof(m_addrs)/sizeof(uint16_t);i++;)
-		m_devs[i] = NULL;
-	};
-    uint16_t addIODevice(IODevice* Dev){
-	if(m_addr==255) return 0xFFFF;
-	m_addr ++;
-	m_devs[m_addr] = Dev;
-	return m_addr;
-	};
-   void pingDev(){
-	event ping_e("Ping Test");
-	for(int i=0;i<m_addr;i++){
-		m_devs[i]->notify(ping_e);
-	};
-	};
-  private:
-	char* m_name;
-//	uint16_t m_addrs[256];
-	IODevice* m_devs[256];
-	uint16_t m_addr = 0;
-};
 
 class event{
 public:
@@ -48,6 +21,29 @@ private:
 	char* m_event;
 };
 
+class IODevice;
+class Computer{
+  public:
+    Computer(const char* name){
+	m_name = new char[strlen(name)+1];
+	strcpy(m_name, name);
+	for(int i = 0;i<256;i++)
+		m_devs[i] = NULL;
+	};
+    unsigned int addIODevice(IODevice* Dev){
+	if(m_addr==255) return 0xFFFF;
+	m_addr ++;
+	m_devs[m_addr] = Dev;
+	return m_addr;
+	};
+   void pingDev();
+  private:
+	char* m_name;
+//	unsigned int m_addrs[256];
+	IODevice* m_devs[256];
+	unsigned int m_addr = 0;
+};
+
 class IODevice{
   public:
     IODevice(Computer* parent_computer ){
@@ -59,9 +55,14 @@ class IODevice{
 	};
   private:
     Computer* m_computer;
-    uint16_t m_addr;
+    unsigned int m_addr;
 };
-
+void Computer::pingDev(){
+	event ping_e("Ping Test");
+	for(int i=0;i<m_addr;i++){
+		m_devs[i]->notify(&ping_e);
+	};
+	};
 class display_properties{
     public:
         display_properties(int x_pix,int y_pix, string MonitorName, int range = 256){
@@ -99,7 +100,7 @@ int main(){
     display_properties DELL(1440,720,"DELL FHD 15inch Monitor");
 
     DELL.get_display_properties();
-    Computer comp("DELL INSPIRON);
+    Computer comp("DELL INSPIRON");
     IODevice dev(&comp);
     comp.pingDev();
 }
