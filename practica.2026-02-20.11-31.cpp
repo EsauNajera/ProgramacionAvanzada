@@ -7,7 +7,7 @@ Programacion Avanzada 7U
 Fabian Quiñones Escarzaga 23040871
 Ing. Mario Gerardo Hernandez Marines
 2026-02-20.11-31
-Practica clasesHeredadasconConstructor
+Practica Clases Heredadas con Constructor
 ************************/
 #include <iostream>
 class A {
